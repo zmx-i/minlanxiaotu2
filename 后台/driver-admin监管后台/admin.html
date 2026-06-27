@@ -1,0 +1,1037 @@
+<!-- admin.html - 民兰校途 监管后台 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民兰校途 - 监管后台</title>
+    <style>
+        /* 这里使用您原来的CSS样式，保持不变 */
+        /* ... 原有样式完整保留 ... */
+        
+        /* 额外补充样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: var(--secondary); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--primary); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-box input {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            width: 250px;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .pagination button:hover {
+            background: var(--border);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar (保留原有) -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            🚗 <span>民兰校途</span>
+            <div style="font-size:11px;font-weight:400;color:var(--text-muted)">监管后台 v1.0</div>
+        </div>
+
+        <div class="nav-item active" onclick="switchTab('dashboard')">
+            <span class="icon">📊</span> 数据概览
+        </div>
+        <div class="nav-item" onclick="switchTab('drivers')">
+            <span class="icon">🚕</span> 司机管理
+            <span class="badge" id="driverCount">0</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('passengers')">
+            <span class="icon">👥</span> 乘客管理
+            <span class="badge" id="passengerCount">0</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('orders')">
+            <span class="icon">📋</span> 订单管理
+            <span class="badge" id="orderCount">0</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('security')">
+            <span class="icon">🛡️</span> 安全中心
+        </div>
+        <div class="nav-item" onclick="switchTab('reports')">
+            <span class="icon">📈</span> 数据报表
+        </div>
+        <div class="nav-item" onclick="switchTab('settings')">
+            <span class="icon">⚙️</span> 系统设置
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1 id="pageTitle">📊 数据概览</h1>
+            <div class="admin-info">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索司机、乘客、订单..." onkeyup="handleSearch(event)">
+                </div>
+                <span style="font-size:14px;color:var(--text-muted)">管理员</span>
+                <div class="admin-avatar" style="background:var(--primary)">管</div>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <div class="stats-grid" id="statsGrid">
+                <!-- 动态加载 -->
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="header">
+                        <div class="title">📈 本周订单趋势</div>
+                        <div style="font-size:12px;color:var(--text-muted)">近7天数据</div>
+                    </div>
+                    <div class="chart-bars" id="chartBars">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="header">
+                        <div class="title">🚗 司机状态</div>
+                    </div>
+                    <div id="driverStatusChart">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drivers View -->
+        <div id="driversView" style="display:none;">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>🚕 司机列表</h3>
+                    <button class="btn-primary action-btn" onclick="showDriverForm()">+ 添加司机</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>车牌</th>
+                            <th>电话</th>
+                            <th>评分</th>
+                            <th>订单数</th>
+                            <th>收入</th>
+                            <th>状态</th>
+                            <th>认证</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="driverTableBody">
+                        <!-- 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Passengers View -->
+        <div id="passengersView" style="display:none;">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>👥 乘客列表</h3>
+                    <button class="btn-primary action-btn" onclick="showPassengerForm()">+ 添加乘客</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>学校</th>
+                            <th>电话</th>
+                            <th>行程数</th>
+                            <th>评分</th>
+                            <th>注册时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="passengerTableBody">
+                        <!-- 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders View -->
+        <div id="ordersView" style="display:none;">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>📋 订单列表</h3>
+                    <div style="display:flex;gap:10px;">
+                        <select id="orderFilter" onchange="loadOrders()" style="padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);">
+                            <option value="all">全部订单</option>
+                            <option value="active">进行中</option>
+                            <option value="pending">待接单</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>乘客</th>
+                            <th>路线</th>
+                            <th>司机</th>
+                            <th>金额</th>
+                            <th>时间</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <!-- 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security View -->
+        <div id="securityView" style="display:none;">
+            <div class="stats-grid" id="securityStats">
+                <!-- 动态加载 -->
+            </div>
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>🛡️ 安全记录</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>类型</th>
+                            <th>内容</th>
+                            <th>上报人</th>
+                            <th>被投诉/警告</th>
+                            <th>时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="securityTableBody">
+                        <!-- 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports View -->
+        <div id="reportsView" style="display:none;">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>📈 数据报表</h3>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="chart-card">
+                        <div class="header">
+                            <div class="title">司机收入排行</div>
+                        </div>
+                        <div id="driverRanking"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="header">
+                            <div class="title">乘客活跃排行</div>
+                        </div>
+                        <div id="passengerRanking"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settingsView" style="display:none;">
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>⚙️ 系统设置</h3>
+                </div>
+                <div id="systemInfo">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modalContent">
+            <!-- 动态内容 -->
+        </div>
+    </div>
+
+    <script>
+        // ========== API 配置 ==========
+        const API_BASE = '/api/admin';
+        
+        // ========== 工具函数 ==========
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showModal(html) {
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // 点击外部关闭弹窗
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) hideModal();
+        });
+
+        // ========== API 调用 ==========
+        async function apiRequest(url, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+            
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                if (!data.success) throw new Error(data.message || '请求失败');
+                return data;
+            } catch (error) {
+                showToast(error.message || '网络错误', 'error');
+                throw error;
+            }
+        }
+
+        // ========== Tab 切换 ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            document.querySelectorAll('[id$="View"]').forEach(view => view.style.display = 'none');
+            
+            const titles = {
+                dashboard: '📊 数据概览',
+                drivers: '🚕 司机管理',
+                passengers: '👥 乘客管理',
+                orders: '📋 订单管理',
+                security: '🛡️ 安全中心',
+                reports: '📈 数据报表',
+                settings: '⚙️ 系统设置'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabName] || '📊 数据概览';
+            
+            const view = document.getElementById(tabName + 'View');
+            if (view) view.style.display = 'block';
+            
+            // 加载对应数据
+            switch(tabName) {
+                case 'dashboard': loadDashboard(); break;
+                case 'drivers': loadDrivers(); break;
+                case 'passengers': loadPassengers(); break;
+                case 'orders': loadOrders(); break;
+                case 'security': loadSecurity(); break;
+                case 'reports': loadReports(); break;
+                case 'settings': loadSystemInfo(); break;
+            }
+        }
+
+        // ========== 加载仪表盘 ==========
+        async function loadDashboard() {
+            try {
+                const result = await apiRequest(`${API_BASE}/dashboard`);
+                const stats = result.data;
+                
+                // 更新统计卡片
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="label">注册司机</div>
+                        <div class="value">${stats.totalDrivers}</div>
+                        <div class="sub green">🟢 ${stats.onlineDrivers} 在线</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">注册用户</div>
+                        <div class="value">${stats.totalPassengers}</div>
+                        <div class="sub green">✅ ${stats.activePassengers} 活跃</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">今日订单</div>
+                        <div class="value">${stats.todayOrders}</div>
+                        <div class="sub green">🟡 ${stats.activeOrders} 进行中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">总流水</div>
+                        <div class="value">¥${stats.totalEarnings.toLocaleString()}</div>
+                        <div class="sub green">📈 持续增长</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">平均评分</div>
+                        <div class="value">${stats.avgRating}</div>
+                        <div class="sub green">⭐ 优质服务</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待处理</div>
+                        <div class="value">${stats.pendingReviews}</div>
+                        <div class="sub ${stats.pendingReviews > 0 ? 'red' : 'green'}">
+                            ${stats.pendingReviews > 0 ? '⚠️ 需处理' : '✅ 已清零'}
+                        </div>
+                    </div>
+                `;
+                
+                // 更新图表
+                updateChartBars();
+                updateDriverStatusChart(stats);
+                
+                // 更新统计数字
+                document.getElementById('driverCount').textContent = stats.totalDrivers;
+                document.getElementById('passengerCount').textContent = stats.totalPassengers;
+                document.getElementById('orderCount').textContent = stats.todayOrders;
+                
+            } catch (error) {
+                document.getElementById('statsGrid').innerHTML = '<div class="loading">无法加载数据，请检查服务器是否运行</div>';
+            }
+        }
+
+        function updateChartBars() {
+            const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            const values = [32, 45, 28, 52, 68, 85, 42];
+            const maxVal = Math.max(...values);
+            
+            document.getElementById('chartBars').innerHTML = days.map((day, i) => `
+                <div class="chart-bar-wrapper">
+                    <div class="chart-bar" style="height:${(values[i]/maxVal)*100}%">
+                        <div class="tooltip">${values[i]} 单</div>
+                    </div>
+                    <div class="chart-label">${day}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateDriverStatusChart(stats) {
+            const onlinePercent = (stats.onlineDrivers / stats.totalDrivers) * 100;
+            const offlinePercent = 100 - onlinePercent;
+            
+            document.getElementById('driverStatusChart').innerHTML = `
+                <div style="display:flex;flex-direction:column;gap:15px">
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                            <span style="font-size:13px">🟢 在线</span>
+                            <span style="font-size:13px;font-weight:600">${stats.onlineDrivers} 人</span>
+                        </div>
+                        <div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">
+                            <div style="height:100%;width:${onlinePercent}%;background:var(--secondary);border-radius:5px"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                            <span style="font-size:13px">🔴 离线</span>
+                            <span style="font-size:13px;font-weight:600">${stats.totalDrivers - stats.onlineDrivers} 人</span>
+                        </div>
+                        <div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">
+                            <div style="height:100%;width:${offlinePercent}%;background:var(--text-muted);border-radius:5px"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== 加载司机列表 ==========
+        async function loadDrivers() {
+            try {
+                const result = await apiRequest(`${API_BASE}/drivers`);
+                const drivers = result.data;
+                
+                document.getElementById('driverTableBody').innerHTML = drivers.map(driver => `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar" style="background:${driver.auth ? 'var(--secondary)' : 'var(--warning)'}">
+                                    ${driver.name[0]}
+                                </div>
+                                ${driver.name}
+                            </div>
+                        </td>
+                        <td>${driver.plate}</td>
+                        <td>${driver.phone}</td>
+                        <td>⭐ ${driver.rating}</td>
+                        <td>${driver.orders}</td>
+                        <td>¥${driver.earnings.toLocaleString()}</td>
+                        <td>
+                            <span class="status-cell ${driver.status === 'online' ? 'active' : 'blocked'}">
+                                ${driver.status === 'online' ? '🟢 在线' : '🔴 离线'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-cell ${driver.auth ? 'active' : 'pending'}">
+                                ${driver.auth ? '✅ 已认证' : '⏳ 待认证'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit" onclick="editDriver(${driver.id})">编辑</button>
+                            <button class="action-btn danger" onclick="toggleDriverStatus(${driver.id}, '${driver.status}')">
+                                ${driver.status === 'online' ? '下线' : '上线'}
+                            </button>
+                            <button class="action-btn danger" onclick="deleteDriver(${driver.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('driverTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--danger)">加载失败</td></tr>';
+            }
+        }
+
+        // ========== 司机操作 ==========
+        function showDriverForm(driver = null) {
+            const isEdit = driver !== null;
+            const title = isEdit ? '编辑司机信息' : '添加新司机';
+            
+            showModal(`
+                <h2>${title}</h2>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="driverName" value="${isEdit ? driver.name : ''}" placeholder="请输入司机姓名">
+                </div>
+                <div class="form-group">
+                    <label>车牌号</label>
+                    <input type="text" id="driverPlate" value="${isEdit ? driver.plate : ''}" placeholder="例如：甘A·8K632">
+                </div>
+                <div class="form-group">
+                    <label>手机号</label>
+                    <input type="text" id="driverPhone" value="${isEdit ? driver.phone : ''}" placeholder="请输入手机号">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="hideModal()">取消</button>
+                    <button class="btn btn-primary" onclick="${isEdit ? `updateDriver(${driver.id})` : 'addDriver()'}">保存</button>
+                </div>
+            `);
+        }
+
+        async function addDriver() {
+            const name = document.getElementById('driverName').value;
+            const plate = document.getElementById('driverPlate').value;
+            const phone = document.getElementById('driverPhone').value;
+            
+            if (!name || !plate || !phone) {
+                showToast('请填写完整信息', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest(`${API_BASE}/drivers`, 'POST', { name, plate, phone });
+                showToast('司机添加成功');
+                hideModal();
+                loadDrivers();
+                loadDashboard();
+            } catch (error) {
+                // 错误已由apiRequest处理
+            }
+        }
+
+        async function editDriver(id) {
+            try {
+                const result = await apiRequest(`${API_BASE}/drivers/${id}`);
+                showDriverForm(result.data);
+            } catch (error) {}
+        }
+
+        async function updateDriver(id) {
+            const name = document.getElementById('driverName').value;
+            const plate = document.getElementById('driverPlate').value;
+            const phone = document.getElementById('driverPhone').value;
+            
+            try {
+                await apiRequest(`${API_BASE}/drivers/${id}`, 'PUT', { name, plate, phone });
+                showToast('司机信息已更新');
+                hideModal();
+                loadDrivers();
+            } catch (error) {}
+        }
+
+        async function toggleDriverStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'online' ? 'offline' : 'online';
+            try {
+                await apiRequest(`${API_BASE}/drivers/${id}/status`, 'PUT', { status: newStatus });
+                showToast(`司机已${newStatus === 'online' ? '上线' : '下线'}`);
+                loadDrivers();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        async function deleteDriver(id) {
+            if (!confirm('确定要删除该司机吗？')) return;
+            try {
+                await apiRequest(`${API_BASE}/drivers/${id}`, 'DELETE');
+                showToast('司机已删除');
+                loadDrivers();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        // ========== 加载乘客列表 ==========
+        async function loadPassengers() {
+            try {
+                const result = await apiRequest(`${API_BASE}/passengers`);
+                const passengers = result.data;
+                
+                document.getElementById('passengerTableBody').innerHTML = passengers.map(p => `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar" style="background:${p.auth ? 'var(--secondary)' : 'var(--warning)'}">
+                                    ${p.name[0]}
+                                </div>
+                                ${p.name}
+                            </div>
+                        </td>
+                        <td>${p.school}</td>
+                        <td>${p.phone}</td>
+                        <td>${p.trips}</td>
+                        <td>⭐ ${p.rating}</td>
+                        <td>${p.joinDate}</td>
+                        <td>
+                            <span class="status-cell ${p.status === 'active' ? 'active' : p.status === 'blocked' ? 'blocked' : 'pending'}">
+                                ${p.status === 'active' ? '✅ 正常' : p.status === 'blocked' ? '🔒 封禁' : '⏳ 待审核'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit" onclick="editPassenger(${p.id})">编辑</button>
+                            <button class="action-btn danger" onclick="deletePassenger(${p.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('passengerTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--danger)">加载失败</td></tr>';
+            }
+        }
+
+        // ========== 乘客操作 ==========
+        function showPassengerForm(passenger = null) {
+            const isEdit = passenger !== null;
+            const title = isEdit ? '编辑乘客信息' : '添加新乘客';
+            
+            showModal(`
+                <h2>${title}</h2>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="passengerName" value="${isEdit ? passenger.name : ''}" placeholder="请输入乘客姓名">
+                </div>
+                <div class="form-group">
+                    <label>学校</label>
+                    <input type="text" id="passengerSchool" value="${isEdit ? passenger.school : ''}" placeholder="请输入学校名称">
+                </div>
+                <div class="form-group">
+                    <label>手机号</label>
+                    <input type="text" id="passengerPhone" value="${isEdit ? passenger.phone : ''}" placeholder="请输入手机号">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="hideModal()">取消</button>
+                    <button class="btn btn-primary" onclick="${isEdit ? `updatePassenger(${passenger.id})` : 'addPassenger()'}">保存</button>
+                </div>
+            `);
+        }
+
+        async function addPassenger() {
+            const name = document.getElementById('passengerName').value;
+            const school = document.getElementById('passengerSchool').value;
+            const phone = document.getElementById('passengerPhone').value;
+            
+            if (!name || !school || !phone) {
+                showToast('请填写完整信息', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest(`${API_BASE}/passengers`, 'POST', { name, school, phone });
+                showToast('乘客添加成功');
+                hideModal();
+                loadPassengers();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        async function editPassenger(id) {
+            try {
+                const result = await apiRequest(`${API_BASE}/passengers/${id}`);
+                showPassengerForm(result.data);
+            } catch (error) {}
+        }
+
+        async function updatePassenger(id) {
+            const name = document.getElementById('passengerName').value;
+            const school = document.getElementById('passengerSchool').value;
+            const phone = document.getElementById('passengerPhone').value;
+            
+            try {
+                await apiRequest(`${API_BASE}/passengers/${id}`, 'PUT', { name, school, phone });
+                showToast('乘客信息已更新');
+                hideModal();
+                loadPassengers();
+            } catch (error) {}
+        }
+
+        async function deletePassenger(id) {
+            if (!confirm('确定要删除该乘客吗？')) return;
+            try {
+                await apiRequest(`${API_BASE}/passengers/${id}`, 'DELETE');
+                showToast('乘客已删除');
+                loadPassengers();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        // ========== 加载订单列表 ==========
+        async function loadOrders() {
+            try {
+                const result = await apiRequest(`${API_BASE}/orders`);
+                let orders = result.data;
+                
+                const filter = document.getElementById('orderFilter')?.value || 'all';
+                if (filter !== 'all') {
+                    orders = orders.filter(o => o.status === filter);
+                }
+                
+                document.getElementById('orderTableBody').innerHTML = orders.map(order => `
+                    <tr>
+                        <td style="font-family:monospace">#${order.id}</td>
+                        <td>${order.passenger}</td>
+                        <td>${order.route}</td>
+                        <td>${order.driver || '未分配'}</td>
+                        <td>¥${order.amount}</td>
+                        <td>${order.time}</td>
+                        <td>${order.type}</td>
+                        <td>
+                            <span class="status-cell ${order.status === 'active' ? 'active' : order.status === 'completed' ? 'pending' : 'blocked'}">
+                                ${order.status === 'active' ? '🟢 进行中' : order.status === 'pending' ? '🟡 待接单' : '✅ 已完成'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit" onclick="editOrder('${order.id}')">编辑</button>
+                            <button class="action-btn danger" onclick="deleteOrder('${order.id}')">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('orderTableBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--danger)">加载失败</td></tr>';
+            }
+        }
+
+        async function deleteOrder(id) {
+            if (!confirm('确定要删除该订单吗？')) return;
+            try {
+                await apiRequest(`${API_BASE}/orders/${id}`, 'DELETE');
+                showToast('订单已删除');
+                loadOrders();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        // ========== 加载安全中心 ==========
+        async function loadSecurity() {
+            try {
+                const result = await apiRequest(`${API_BASE}/security`);
+                const data = result.data;
+                
+                document.getElementById('securityStats').innerHTML = `
+                    <div class="stat-card">
+                        <div class="label">总记录</div>
+                        <div class="value">${data.totalAlerts}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">已处理</div>
+                        <div class="value" style="color:var(--secondary)">${data.resolvedAlerts}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待处理</div>
+                        <div class="value" style="color:var(--danger)">${data.pendingReviews}</div>
+                    </div>
+                `;
+                
+                document.getElementById('securityTableBody').innerHTML = data.logs.map(log => `
+                    <tr>
+                        <td>
+                            <span class="status-cell ${log.type === '投诉' ? 'blocked' : 'pending'}">
+                                ${log.type === '投诉' ? '📢 投诉' : '⚠️ 警告'}
+                            </span>
+                        </td>
+                        <td>${log.content}</td>
+                        <td>${log.reporter}</td>
+                        <td>${log.target}</td>
+                        <td>${log.time}</td>
+                        <td>
+                            <span class="status-cell ${log.status === 'resolved' ? 'active' : 'pending'}">
+                                ${log.status === 'resolved' ? '✅ 已处理' : '⏳ 待处理'}
+                            </span>
+                        </td>
+                        <td>
+                            ${log.status === 'pending' ? 
+                                `<button class="action-btn edit" onclick="resolveSecurity(${log.id})">标记处理</button>` : 
+                                '<span style="color:var(--text-muted)">已处理</span>'
+                            }
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('securityTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--danger)">加载失败</td></tr>';
+            }
+        }
+
+        async function resolveSecurity(id) {
+            try {
+                await apiRequest(`${API_BASE}/security/${id}`, 'PUT', { status: 'resolved' });
+                showToast('已标记为处理完成');
+                loadSecurity();
+                loadDashboard();
+            } catch (error) {}
+        }
+
+        // ========== 加载报表 ==========
+        async function loadReports() {
+            try {
+                const driversResult = await apiRequest(`${API_BASE}/drivers`);
+                const passengersResult = await apiRequest(`${API_BASE}/passengers`);
+                
+                const topDrivers = driversResult.data.sort((a, b) => b.earnings - a.earnings).slice(0, 5);
+                const topPassengers = passengersResult.data.sort((a, b) => b.trips - a.trips).slice(0, 5);
+                
+                document.getElementById('driverRanking').innerHTML = topDrivers.map((d, i) => `
+                    <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid var(--border)">
+                        <span>${i + 1}. ${d.name} (${d.plate})</span>
+                        <span style="color:var(--secondary);font-weight:600">¥${d.earnings.toLocaleString()}</span>
+                    </div>
+                `).join('');
+                
+                document.getElementById('passengerRanking').innerHTML = topPassengers.map((p, i) => `
+                    <div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid var(--border)">
+                        <span>${i + 1}. ${p.name} (${p.school})</span>
+                        <span style="color:var(--secondary);font-weight:600">${p.trips} 次</span>
+                    </div>
+                `).join('');
+                
+            } catch (error) {}
+        }
+
+        // ========== 加载系统信息 ==========
+        async function loadSystemInfo() {
+            try {
+                const result = await apiRequest(`${API_BASE}/system`);
+                const info = result.data;
+                
+                document.getElementById('systemInfo').innerHTML = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div class="stat-card">
+                            <div class="label">系统版本</div>
+                            <div class="value" style="font-size:20px">v${info.version}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">运行时间</div>
+                            <div class="value" style="font-size:20px">${info.uptime}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Node.js 版本</div>
+                            <div class="value" style="font-size:20px">${info.nodeVersion}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">内存使用</div>
+                            <div class="value" style="font-size:20px">${info.memoryUsage}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">API 调用</div>
+                            <div class="value" style="font-size:20px">${info.apiCalls.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">最后更新</div>
+                            <div class="value" style="font-size:16px">${new Date(info.lastUpdate).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                document.getElementById('systemInfo').innerHTML = '<div class="loading">无法加载系统信息</div>';
+            }
+        }
+
+        // ========== 搜索功能 ==========
+        let searchTimer;
+        async function handleSearch(event) {
+            clearTimeout(searchTimer);
+            const query = event.target.value.trim();
+            
+            searchTimer = setTimeout(async () => {
+                if (!query) {
+                    switchTab(document.querySelector('.nav-item.active')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'dashboard');
+                    return;
+                }
+                
+                try {
+                    const result = await apiRequest(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+                    
+                    // 显示搜索结果
+                    document.querySelectorAll('[id$="View"]').forEach(v => v.style.display = 'none');
+                    
+                    let html = '<div class="table-section"><h3 style="margin-bottom:20px">🔍 搜索结果</h3>';
+                    
+                    if (result.data.drivers.length > 0) {
+                        html += '<h4 style="margin:15px 0">🚕 司机</h4>';
+                        result.data.drivers.forEach(d => {
+                            html += `<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+                                <span>${d.name} - ${d.plate}</span>
+                                <button class="action-btn edit" onclick="switchTab('drivers')">查看</button>
+                            </div>`;
+                        });
+                    }
+                    
+                    if (result.data.passengers.length > 0) {
+                        html += '<h4 style="margin:15px 0">👥 乘客</h4>';
+                        result.data.passengers.forEach(p => {
+                            html += `<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+                                <span>${p.name} - ${p.school}</span>
+                                <button class="action-btn edit" onclick="switchTab('passengers')">查看</button>
+                            </div>`;
+                        });
+                    }
+                    
+                    if (result.data.orders.length > 0) {
+                        html += '<h4 style="margin:15px 0">📋 订单</h4>';
+                        result.data.orders.forEach(o => {
+                            html += `<div style="padding:10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+                                <span>#${o.id} - ${o.route}</span>
+                                <button class="action-btn edit" onclick="switchTab('orders')">查看</button>
+                            </div>`;
+                        });
+                    }
+                    
+                    if (result.data.drivers.length === 0 && result.data.passengers.length === 0 && result.data.orders.length === 0) {
+                        html += '<div style="text-align:center;padding:20px;color:var(--text-muted)">未找到相关结果</div>';
+                    }
+                    
+                    html += '</div>';
+                    
+                    // 显示在临时区域
+                    const tempDiv = document.createElement('div');
+                    tempDiv.id = 'searchView';
+                    tempDiv.innerHTML = html;
+                    document.querySelector('.main-content').appendChild(tempDiv);
+                    
+                } catch (error) {}
+            }, 500);
+        }
+
+        // ========== 初始化 ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,623 @@
+<!-- 司机页面 - driver.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民兰校途 - 司机端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #1a5fa8;
+            --primary-dark: #0d3b6e;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .driver-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .driver-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .driver-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .driver-header .subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+        }
+
+        .driver-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-badge {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-badge.online {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .status-badge.offline {
+            background: var(--text-muted);
+            color: var(--bg);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-card .change {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .stat-card .change.up { color: var(--secondary); }
+        .stat-card .change.down { color: var(--danger); }
+
+        /* Orders Section */
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .orders-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .order-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(26, 95, 168, 0.1);
+        }
+
+        .order-info {
+            flex: 1;
+        }
+
+        .order-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .order-route {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-status.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .order-status.accepted {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+
+        .order-status.completed {
+            background: rgba(26, 95, 168, 0.2);
+            color: var(--primary);
+        }
+
+        .order-details {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .order-detail {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .order-detail strong {
+            color: var(--text);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Earnings Section */
+        .earnings-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .earnings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .earnings-total {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .earnings-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .earning-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .driver-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .order-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .order-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="driver-container">
+        <!-- Header -->
+        <div class="driver-header">
+            <div>
+                <h1>🚗 司机工作台</h1>
+                <div class="subtitle">民兰校途 · 校园出行平台</div>
+            </div>
+            <div class="driver-status">
+                <div class="status-badge online" id="statusBadge" onclick="toggleStatus()">🟢 在线接单</div>
+                <div class="driver-info">
+                    <div style="font-weight:600">王师傅</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.6)">甘A·8K632</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">今日订单</div>
+                <div class="value">12</div>
+                <div class="change up">↑ 3 单较昨日</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">今日收入</div>
+                <div class="value">¥386</div>
+                <div class="change up">↑ ¥68 较昨日</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">评分</div>
+                <div class="value">4.9</div>
+                <div class="change up">⭐ 优质司机</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">完成率</div>
+                <div class="value">100%</div>
+                <div class="change up">✅ 本月无取消</div>
+            </div>
+        </div>
+
+        <!-- New Orders -->
+        <div class="section-title">
+            📋 新订单
+            <span style="font-size:14px;color:var(--text-muted);font-weight:400">（等待接单）</span>
+        </div>
+
+        <div class="orders-grid" id="newOrders">
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-route">榆中校区 → 中川机场</div>
+                        <div class="order-status pending">等待接单</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-detail">📅 <strong>今天 14:30</strong></div>
+                        <div class="order-detail">👤 <strong>杨同学</strong> · 西北民大</div>
+                        <div class="order-detail">👥 <strong>3人</strong> 拼车</div>
+                        <div class="order-detail">💰 <strong>¥60</strong> 预估</div>
+                        <div class="order-detail">📍 <strong>约80km</strong></div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-primary" onclick="acceptOrder(this)">接单</button>
+                    <button class="btn btn-secondary" onclick="declineOrder(this)">拒绝</button>
+                </div>
+            </div>
+
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-route">榆中校区 → 兰州西站</div>
+                        <div class="order-status pending">等待接单</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-detail">📅 <strong>今天 15:00</strong></div>
+                        <div class="order-detail">👤 <strong>李同学</strong> · 兰州大学</div>
+                        <div class="order-detail">👥 <strong>2人</strong> 拼车</div>
+                        <div class="order-detail">💰 <strong>¥35</strong> 预估</div>
+                        <div class="order-detail">📍 <strong>约50km</strong></div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-primary" onclick="acceptOrder(this)">接单</button>
+                    <button class="btn btn-secondary" onclick="declineOrder(this)">拒绝</button>
+                </div>
+            </div>
+
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-route">榆中校区 → 兰州火车站</div>
+                        <div class="order-status pending">等待接单</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-detail">📅 <strong>今天 15:30</strong></div>
+                        <div class="order-detail">👤 <strong>张同学</strong> · 西北民大</div>
+                        <div class="order-detail">👥 <strong>4人</strong> 独立约车</div>
+                        <div class="order-detail">💰 <strong>¥112</strong> 预估</div>
+                        <div class="order-detail">📍 <strong>约45km</strong></div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-primary" onclick="acceptOrder(this)">接单</button>
+                    <button class="btn btn-secondary" onclick="declineOrder(this)">拒绝</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Orders -->
+        <div class="section-title" style="margin-top:25px">
+            🚦 进行中订单
+            <span style="font-size:14px;color:var(--text-muted);font-weight:400">（已接单）</span>
+        </div>
+
+        <div class="orders-grid" id="activeOrders">
+            <div class="order-card" style="border-left:4px solid var(--secondary)">
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-route">榆中校区 → 中川机场</div>
+                        <div class="order-status accepted">已接单 · 行程中</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-detail">📅 <strong>出发 13:00</strong></div>
+                        <div class="order-detail">👤 <strong>王同学</strong> · 西北民大</div>
+                        <div class="order-detail">📞 <strong>138****0001</strong></div>
+                        <div class="order-detail">📍 <strong>已行驶 35km</strong></div>
+                        <div class="order-detail">⏱ <strong>预计 15min 后到达</strong></div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-success" onclick="completeOrder(this)">完成行程</button>
+                    <button class="btn btn-secondary" onclick="contactPassenger()">联系乘客</button>
+                </div>
+            </div>
+
+            <div class="order-card" style="border-left:4px solid var(--warning)">
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-route">榆中校区 → 兰州西站</div>
+                        <div class="order-status accepted">已接单 · 等待出发</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-detail">📅 <strong>出发 14:00</strong></div>
+                        <div class="order-detail">👤 <strong>赵同学</strong> · 兰州大学</div>
+                        <div class="order-detail">📞 <strong>139****0002</strong></div>
+                        <div class="order-detail">👥 <strong>3人</strong> 拼车</div>
+                        <div class="order-detail">📍 <strong>请按时到达上车点</strong></div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-danger" onclick="cancelOrder(this)">取消订单</button>
+                    <button class="btn btn-secondary" onclick="contactPassenger()">联系乘客</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings -->
+        <div class="earnings-section">
+            <div class="earnings-header">
+                <div>
+                    <div style="font-size:14px;color:var(--text-muted)">本周收入</div>
+                    <div class="earnings-total">¥2,580</div>
+                </div>
+                <button class="btn btn-primary">查看明细</button>
+            </div>
+            <div class="earnings-list">
+                <div class="earning-item">
+                    <div>
+                        <div style="font-weight:600">榆中校区 → 中川机场</div>
+                        <div style="font-size:12px;color:var(--text-muted)">今天 13:00</div>
+                    </div>
+                    <div style="font-weight:600;color:var(--secondary)">+¥60.00</div>
+                </div>
+                <div class="earning-item">
+                    <div>
+                        <div style="font-weight:600">榆中校区 → 兰州火车站</div>
+                        <div style="font-size:12px;color:var(--text-muted)">昨天 16:30</div>
+                    </div>
+                    <div style="font-weight:600;color:var(--secondary)">+¥28.00</div>
+                </div>
+                <div class="earning-item">
+                    <div>
+                        <div style="font-weight:600">榆中校区 → 兰州西站</div>
+                        <div style="font-size:12px;color:var(--text-muted)">昨天 10:00</div>
+                    </div>
+                    <div style="font-weight:600;color:var(--secondary)">+¥35.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isOnline = true;
+
+        function toggleStatus() {
+            isOnline = !isOnline;
+            const badge = document.getElementById('statusBadge');
+            if (isOnline) {
+                badge.className = 'status-badge online';
+                badge.innerHTML = '🟢 在线接单';
+                showToast('已切换为在线状态，可以接单');
+            } else {
+                badge.className = 'status-badge offline';
+                badge.innerHTML = '🔴 离线休息';
+                showToast('已离线，暂时不会收到新订单');
+            }
+        }
+
+        function acceptOrder(btn) {
+            const card = btn.closest('.order-card');
+            card.style.borderLeft = '4px solid var(--secondary)';
+            const status = card.querySelector('.order-status');
+            status.className = 'order-status accepted';
+            status.textContent = '已接单';
+            showToast('✅ 已接单，请前往乘客上车点');
+            
+            // Move to active orders
+            const activeContainer = document.getElementById('activeOrders');
+            const actions = card.querySelector('.order-actions');
+            actions.innerHTML = `
+                <button class="btn btn-success" onclick="completeOrder(this)">完成行程</button>
+                <button class="btn btn-secondary" onclick="contactPassenger()">联系乘客</button>
+            `;
+            activeContainer.appendChild(card);
+        }
+
+        function declineOrder(btn) {
+            const card = btn.closest('.order-card');
+            card.style.opacity = '0.5';
+            showToast('已拒绝该订单');
+            setTimeout(() => {
+                card.remove();
+            }, 500);
+        }
+
+        function completeOrder(btn) {
+            const card = btn.closest('.order-card');
+            const status = card.querySelector('.order-status');
+            status.className = 'order-status completed';
+            status.textContent = '已完成';
+            showToast('🎉 行程已完成！感谢您的服务');
+            
+            const actions = card.querySelector('.order-actions');
+            actions.innerHTML = `
+                <button class="btn btn-secondary" onclick="showToast('乘客评价：⭐⭐⭐⭐⭐')">查看评价</button>
+            `;
+        }
+
+        function cancelOrder(btn) {
+            if (confirm('确定取消该订单吗？')) {
+                const card = btn.closest('.order-card');
+                card.remove();
+                showToast('订单已取消');
+            }
+        }
+
+        function contactPassenger() {
+            showToast('📞 正在连接乘客...');
+        }
+
+        function showToast(msg) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = msg;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                padding: 15px 30px;
+                border-radius: 12px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                animation: slideUp 0.3s ease;
+            `;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

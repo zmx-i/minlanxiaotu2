@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>民兰校途 · 后台管理</title>
+<style>
+/* ========== 全局重置与变量 ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #1a5fa8;
+  --primary-dark: #134b85;
+  --primary-light: #3b82f6;
+  --green: #14b87a;
+  --red: #dc2626;
+  --gold: #d97706;
+  --orange: #f59e0b;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --sidebar-width: 260px;
+  --header-height: 64px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== 侧边栏 ========== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a237e 0%, #283593 50%, #1a5fa8 100%);
+  color: #fff;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header .logo {
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-header .logo-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.sidebar-header .subtitle {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 4px;
+  padding-left: 46px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  margin-bottom: 24px;
+}
+
+.nav-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  margin-bottom: 2px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-item .icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-footer .admin-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-footer .admin-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.sidebar-footer .admin-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sidebar-footer .admin-role {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* ========== 主内容区 ========== */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部栏 */
+.topbar {
+  height: var(--header-height);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-left h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.topbar-left .breadcrumb {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-right .search-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 6px 12px;
+  gap: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.topbar-right .search-box:focus-within {
+  border-color: var(--primary);
+  background: var(--card);
+  box-shadow: 0 0 0 3px rgba(26,95,168,0.1);
+}
+
+.topbar-right .search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  width: 200px;
+  color: var(--text);
+}
+
+.topbar-right .search-box input::placeholder {
+  color: var(--text-secondary);
+}
+
+.topbar-right .icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.topbar-right .icon-btn:hover {
+  background: var(--border);
+}
+
+.topbar-right .icon-btn .dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid var(--card);
+}
+
+/* 页面内容 */
+.page-content {
+  padding: 24px;
+  flex: 1;
+}
+
+/* ========== 统计卡片 ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.stat-card .stat-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 32px;
+  opacity: 0.1;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-change {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-card .stat-change.up { color: var(--green); }
+.stat-card .stat-change.down { color: var(--red); }
+
+/* ========== 面板容器 ========== */
+.panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header .panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-header .panel-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-body {
+  padding: 20px 24px;
+}
+
+.panel-body.no-padding {
+  padding: 0;
+}
+
+/* ========== 表格 ========== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background: var(--bg);
+}
+
+.data-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.data-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 表格内元素 */
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-cell .user-name {
+  font-weight: 600;
+}
+
+.user-cell .user-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.online {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-badge.offline {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status-badge.active {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-badge.waiting {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.rating-stars {
+  color: #f59e0b;
+  font-size: 13px;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.action-btn.primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.action-btn.primary:hover {
+  background: var(--primary-dark);
+}
+
+.action-btn.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn.danger:hover {
+  background: #fecaca;
+}
+
+.action-btn.outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.action-btn.outline:hover {
+  background: var(--bg);
+}
+
+/* ========== 地图实时监控 ========== */
+.map-container {
+  width: 100%;
+  height: 400px;
+  background: linear-gradient(180deg, #e9f2f9 0%, #d4e6f5 30%, #c8dce8 60%, #bcd4e0 100%);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.map-container .map-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  background-image: 
+    linear-gradient(rgba(148,163,184,0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.map-container .map-marker {
+  position: absolute;
+  font-size: 24px;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  transition: left 0.3s linear, top 0.3s linear;
+}
+
+.map-container .map-marker .marker-label {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.9);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 4px;
+}
+
+/* ========== 实时日志 ========== */
+.log-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.log-item:last-child {
+  border-bottom: none;
+}
+
+.log-item .log-time {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: monospace;
+  min-width: 70px;
+}
+
+.log-item .log-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.log-item .log-msg {
+  flex: 1;
+}
+
+.log-item .log-type {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.log-type.info { background: #dbeafe; color: #2563eb; }
+.log-type.warning { background: #fef9c3; color: #a16207; }
+.log-type.error { background: #fee2e2; color: #dc2626; }
+.log-type.success { background: #dcfce7; color: #16a34a; }
+
+/* ========== 模态框 ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-header .modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.modal-header .modal-close:hover {
+  background: var(--border);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* 详情卡片 */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item .detail-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.detail-item .detail-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.detail-item .detail-value.large {
+  font-size: 18px;
+}
+
+/* ========== 表单 ========== */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group .form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group .form-control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: var(--card);
+  color: var(--text);
+}
+
+.form-group .form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26,95,168,0.1);
+}
+
+.form-group .form-control::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-group select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* ========== 选项卡 ========== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty-state .empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.empty-state .empty-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ========== 页面切换 ========== */
+.page-section {
+  display: none;
+}
+
+.page-section.active {
+  display: block;
+}
+
+/* ========== 移动端适配 ========== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-right .search-box input {
+    width: 120px;
+  }
+
+  .topbar-left h2 {
+    font-size: 16px;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+
+  .data-table {
+    font-size: 12px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+  }
+}
+
+.mobile-menu-btn {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* ========== 滚动条美化 ========== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ========== 通知Toast ========== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  animation: toastIn 0.3s ease;
+  max-width: 360px;
+  border: 1px solid var(--border);
+}
+
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error { border-left: 4px solid var(--red); }
+.toast.warning { border-left: 4px solid var(--gold); }
+.toast.info { border-left: 4px solid var(--primary); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 加载动画 */
+.spinner-sm {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.header-online-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--green);
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-left: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 侧边栏 ========== -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">🚗</div>
+      民兰校途
+    </div>
+    <div class="subtitle">后台管理系统 v2.0</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">概览</div>
+      <a class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+        <span class="icon">📊</span> 仪表盘
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">用户管理</div>
+      <a class="nav-item" data-page="drivers" onclick="switchPage('drivers')">
+        <span class="icon">🚕</span> 司机管理
+        <span class="badge" id="driverCountBadge">0</span>
+      </a>
+      <a class="nav-item" data-page="passengers" onclick="switchPage('passengers')">
+        <span class="icon">👥</span> 乘客管理
+        <span class="badge" id="passengerCountBadge">0</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">订单</div>
+      <a class="nav-item" data-page="orders" onclick="switchPage('orders')">
+        <span class="icon">📋</span> 订单管理
+        <span class="badge" id="orderCountBadge">0</span>
+      </a>
+      <a class="nav-item" data-page="realtime" onclick="switchPage('realtime')">
+        <span class="icon">📍</span> 实时追踪
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">系统</div>
+      <a class="nav-item" data-page="logs" onclick="switchPage('logs')">
+        <span class="icon">📝</span> 操作日志
+      </a>
+      <a class="nav-item" data-page="settings" onclick="switchPage('settings')">
+        <span class="icon">⚙️</span> 系统设置
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar">管</div>
+      <div>
+        <div class="admin-name">管理员</div>
+        <div class="admin-role">超级管理员</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 主内容区 ========== -->
+<div class="main-content">
+  <!-- 顶部栏 -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div>
+        <h2 id="pageTitle">仪表盘</h2>
+        <div class="breadcrumb" id="breadcrumb">首页 / 仪表盘</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="搜索司机、乘客、订单..." id="globalSearch" oninput="debounceSearch(this.value)">
+      </div>
+      <button class="icon-btn" onclick="refreshData()" title="刷新数据">
+        🔄
+      </button>
+      <button class="icon-btn" onclick="showToast('info', '有 3 条新消息')" title="消息">
+        🔔
+        <span class="dot"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 页面内容 -->
+  <div class="page-content">
+
+    <!-- ===== 仪表盘 ===== -->
+    <div class="page-section active" id="page-dashboard">
+      <div class="stats-grid" id="dashboardStats">
+        <div class="stat-card">
+          <div class="stat-icon">🚕</div>
+          <div class="stat-label">注册司机</div>
+          <div class="stat-value" id="statDrivers">-</div>
+          <div class="stat-change up" id="statDriversChange">↑ 在线: 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">注册乘客</div>
+          <div class="stat-value" id="statPassengers">-</div>
+          <div class="stat-change up" id="statPassengersChange">↑ 活跃: 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">今日订单</div>
+          <div class="stat-value" id="statOrders">-</div>
+          <div class="stat-change up" id="statOrdersChange">↑ 已完成: 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">今日收入</div>
+          <div class="stat-value" id="statRevenue">¥-</div>
+          <div class="stat-change up" id="statRevenueChange">↑ 较昨日: 0%</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📈 实时动态</div>
+          <div class="panel-actions">
+            <button class="btn btn-sm btn-secondary" onclick="refreshData()">刷新</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="log-container" id="realtimeLog">
+            <div class="empty-state">
+              <div class="spinner-sm" style="margin: 0 auto 12px;"></div>
+              <div class="empty-title">正在加载实时数据...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">🟢 在线司机</div>
+          </div>
+          <div class="panel-body no-padding">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>司机</th>
+                  <th>车牌</th>
+                  <th>评分</th>
+                  <th>今日订单</th>
+                </tr>
+              </thead>
+              <tbody id="onlineDriversTable">
+                <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无在线司机</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">⏳ 待处理订单</div>
+          </div>
+          <div class="panel-body no-padding">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>乘客</th>
+                  <th>路线</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="pendingOrdersTable">
+                <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无待处理订单</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 司机管理 ===== -->
+    <div class="page-section" id="page-drivers">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🚕 司机列表</div>
+          <div class="panel-actions">
+            <button class="btn btn-primary btn-sm" onclick="openDriverModal()">+ 添加司机</button>
+          </div>
+        </div>
+        <div class="panel-body no-padding">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>车牌</th>
+                <th>手机</th>
+                <th>状态</th>
+                <th>评分</th>
+                <th>订单</th>
+                <th>加入时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="driversTableBody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;">
+                <div class="spinner-sm" style="margin:0 auto 8px;"></div>
+                加载中...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 乘客管理 ===== -->
+    <div class="page-section" id="page-passengers">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">👥 乘客列表</div>
+          <div class="panel-actions">
+            <button class="btn btn-primary btn-sm" onclick="openPassengerModal()">+ 添加乘客</button>
+          </div>
+        </div>
+        <div class="panel-body no-padding">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>手机</th>
+                <th>学校</th>
+                <th>订单数</th>
+                <th>注册时间</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="passengersTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:40px;">
+                <div class="spinner-sm" style="margin:0 auto 8px;"></div>
+                加载中...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 订单管理 ===== -->
+    <div class="page-section" id="page-orders">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📋 订单列表</div>
+          <div class="panel-actions">
+            <select class="form-control" style="width:auto;padding:6px 30px 6px 12px;font-size:13px;" id="orderFilter" onchange="filterOrders()">
+              <option value="all">全部订单</option>
+              <option value="waiting">匹配中</option>
+              <option value="matched">已配对</option>
+              <option value="active">行程中</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body no-padding">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>订单ID</th>
+                <th>乘客</th>
+                <th>司机</th>
+                <th>路线</th>
+                <th>金额</th>
+                <th>状态</th>
+                <th>时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;">
+                <div class="spinner-sm" style="margin:0 auto 8px;"></div>
+                加载中...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 实时追踪 ===== -->
+    <div class="page-section" id="page-realtime">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📍 实时车辆追踪</div>
+          <div class="panel-actions">
+            <span class="header-online-count">🟢 <span id="realtimeOnlineCount">0</span> 辆在线</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="map-container" id="realtimeMap">
+            <div class="map-grid-overlay"></div>
+            <!-- 动态地图标记 -->
+            <div id="mapMarkersContainer"></div>
+            <div style="position:absolute;bottom:16px;left:16px;background:rgba(255,255,255,0.9);padding:10px 16px;border-radius:8px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+              🟢 在线司机位置模拟<br>
+              <span style="color:var(--text-secondary);">数据每 5 秒更新一次</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div class="stat-card" style="flex:1;min-width:150px;">
+              <div class="stat-label">活跃行程</div>
+              <div class="stat-value" id="activeTrips">0</div>
+            </div>
+            <div class="stat-card" style="flex:1;min-width:150px;">
+              <div class="stat-label">今日完成</div>
+              <div class="stat-value" id="todayCompleted">0</div>
+            </div>
+            <div class="stat-card" style="flex:1;min-width:150px;">
+              <div class="stat-label">平均评分</div>
+              <div class="stat-value" id="avgRating">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📡 实时行程列表</div>
+        </div>
+        <div class="panel-body no-padding">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>司机</th>
+                <th>乘客</th>
+                <th>起点 → 终点</th>
+                <th>进度</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody id="activeTripsTable">
+              <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无进行中的行程</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 操作日志 ===== -->
+    <div class="page-section" id="page-logs">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📝 操作日志</div>
+          <div class="panel-actions">
+            <button class="btn btn-sm btn-secondary" onclick="clearLogs()">清空</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="log-container" id="logsContainer">
+            <div class="empty-state">
+              <div class="empty-icon">📝</div>
+              <div class="empty-title">暂无操作日志</div>
+              <div class="empty-desc">系统操作记录将在这里显示</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 系统设置 ===== -->
+    <div class="page-section" id="page-settings">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⚙️ 系统设置</div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">平台名称</label>
+            <input type="text" class="form-control" value="民兰校途" id="settingPlatformName">
+          </div>
+          <div class="form-group">
+            <label class="form-label">客服电话</label>
+            <input type="text" class="form-control" value="0931-8888888" id="settingPhone">
+          </div>
+          <div class="form-group">
+            <label class="form-label">每公里单价 (元)</label>
+            <input type="number" class="form-control" value="1.5" id="settingPricePerKm" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">平台抽成比例</label>
+            <input type="number" class="form-control" value="10" id="settingCommission" min="0" max="100" step="1">
+            <small style="color:var(--text-secondary);font-size:12px;">百分比 (%)</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">系统状态</label>
+            <select class="form-control" id="settingSystemStatus">
+              <option value="normal">正常运行</option>
+              <option value="maintenance">维护中</option>
+              <option value="limited">限制运营</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📊 系统信息</div>
+        </div>
+        <div class="panel-body">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">系统版本</span>
+              <span class="detail-value">v2.0.0</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">运行时间</span>
+              <span class="detail-value" id="uptime">-</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">数据库</span>
+              <span class="detail-value">SQLite</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">API 状态</span>
+              <span class="detail-value" style="color:var(--green);">✅ 运行正常</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== 司机模态框 ========== -->
+<div class="modal-overlay" id="driverModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="driverModalTitle">添加司机</div>
+      <button class="modal-close" onclick="closeModal('driverModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editDriverId">
+      <div class="form-group">
+        <label class="form-label">司机姓名</label>
+        <input type="text" class="form-control" id="driverName" placeholder="请输入姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">手机号</label>
+        <input type="text" class="form-control" id="driverPhone" placeholder="请输入手机号">
+      </div>
+      <div class="form-group">
+        <label class="form-label">车牌号码</label>
+        <input type="text" class="form-control" id="driverPlate" placeholder="如：甘A·8K632">
+      </div>
+      <div class="form-group">
+        <label class="form-label">邮箱 (选填)</label>
+        <input type="email" class="form-control" id="driverEmail" placeholder="请输入邮箱">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('driverModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveDriver()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 乘客模态框 ========== -->
+<div class="modal-overlay" id="passengerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="passengerModalTitle">添加乘客</div>
+      <button class="modal-close" onclick="closeModal('passengerModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editPassengerId">
+      <div class="form-group">
+        <label class="form-label">乘客姓名</label>
+        <input type="text" class="form-control" id="passengerName" placeholder="请输入姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">手机号</label>
+        <input type="text" class="form-control" id="passengerPhone" placeholder="请输入手机号">
+      </div>
+      <div class="form-group">
+        <label class="form-label">学校</label>
+        <input type="text" class="form-control" id="passengerSchool" placeholder="如：兰州大学">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('passengerModal')">取消</button>
+      <button class="btn btn-primary" onclick="savePassenger()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 详情模态框 ========== -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" style="max-width: 700px;">
+    <div class="modal-header">
+      <div class="modal-title" id="detailModalTitle">详情</div>
+      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailModalBody">
+      <div class="spinner-sm" style="margin:20px auto;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('detailModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Toast 通知容器 ========== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== 数据存储 ====================
+const DATA = {
+  drivers: [],
+  passengers: [],
+  orders: [],
+  logs: []
+};
+
+// 模拟初始数据
+function initMockData() {
+  const names = ['张伟', '王强', '李磊', '赵明', '刘洋', '陈刚', '杨军', '孙斌', '周杰', '吴昊'];
+  const plates = ['甘A·7M321', '甘A·8K632', '甘A·5A981', '甘A·3B672', '甘A·9D145', '甘A·6E823', '甘A·2F564', '甘A·1G987'];
+  const schools = ['兰州大学', '西北师范大学', '兰州交通大学', '甘肃农业大学', '兰州理工大学', '西北民族大学'];
+  
+  // 司机
+  for (let i = 0; i < 15; i++) {
+    const isOnline = Math.random() > 0.4;
+    DATA.drivers.push({
+      id: i + 1,
+      name: names[i % names.length] + (Math.floor(i / names.length) ? '' : ''),
+      phone: '138' + String(10000000 + i).slice(0, 8),
+      plate: plates[i % plates.length],
+      email: `driver${i+1}@example.com`,
+      status: isOnline ? 'online' : 'offline',
+      rating: (4.5 + Math.random() * 0.5).toFixed(1),
+      orders: Math.floor(Math.random() * 200 + 50),
+      joinDate: `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+      earnings: Math.floor(Math.random() * 5000 + 1000)
+    });
+  }
+
+  // 乘客
+  for (let i = 0; i < 25; i++) {
+    DATA.passengers.push({
+      id: i + 1,
+      name: names[Math.floor(Math.random() * names.length)],
+      phone: '139' + String(20000000 + i).slice(0, 8),
+      school: schools[Math.floor(Math.random() * schools.length)],
+      orders: Math.floor(Math.random() * 30),
+      joinDate: `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+      status: Math.random() > 0.3 ? 'active' : 'inactive'
+    });
+  }
+
+  // 订单
+  const statuses = ['waiting', 'matched', 'active', 'completed', 'cancelled'];
+  for (let i = 0; i < 40; i++) {
+    const driverIdx = Math.floor(Math.random() * DATA.drivers.length);
+    const passengerIdx = Math.floor(Math.random() * DATA.passengers.length);
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const isToday = Math.random() > 0.5;
+    const date = isToday 
+      ? new Date().toISOString().split('T')[0]
+      : `2024-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`;
+    
+    DATA.orders.push({
+      id: 2024000 + i,
+      passenger: DATA.passengers[passengerIdx].name,
+      driver: status !== 'waiting' ? DATA.drivers[driverIdx].name : '待分配',
+      from: ['兰州大学', '西关十字', '兰州西站', '中川机场', '东方红广场'][Math.floor(Math.random() * 5)],
+      to: ['榆中校区', '兰州中心', '安宁区', '七里河', '城关区'][Math.floor(Math.random() * 5)],
+      amount: (20 + Math.random() * 80).toFixed(2),
+      status: status,
+      date: date,
+      time: `${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`
+    });
+  }
+
+  // 日志
+  const logTypes = ['info', 'success', 'warning', 'error'];
+  const logMsgs = [
+    '司机张伟 上线接单',
+    '乘客李雅 发布了新订单',
+    '订单 #2024100 已完成',
+    '司机王强 状态改为离线',
+    '新注册乘客: 18人',
+    '系统自动匹配订单 #2024105',
+    '司机赵明 评分更新至 4.8',
+    '订单 #2024112 已取消',
+    '乘客刘洋 联系了客服',
+    '司机孙斌 完成第 100 单'
+  ];
+  for (let i = 0; i < 20; i++) {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - Math.floor(Math.random() * 120));
+    DATA.logs.push({
+      time: d.toLocaleTimeString('zh-CN', { hour12: false }),
+      type: logTypes[Math.floor(Math.random() * logTypes.length)],
+      msg: logMsgs[Math.floor(Math.random() * logMsgs.length)]
+    });
+  }
+  DATA.logs.sort((a, b) => b.time.localeCompare(a.time));
+}
+
+// ==================== 核心功能 ====================
+
+// 页面切换
+function switchPage(page) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  
+  const titles = {
+    dashboard: '仪表盘',
+    drivers: '司机管理',
+    passengers: '乘客管理',
+    orders: '订单管理',
+    realtime: '实时追踪',
+    logs: '操作日志',
+    settings: '系统设置'
+  };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  document.getElementById('breadcrumb').textContent = `首页 / ${titles[page] || page}`;
+  
+  // 渲染对应页面
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'drivers') renderDrivers();
+  else if (page === 'passengers') renderPassengers();
+  else if (page === 'orders') renderOrders();
+  else if (page === 'realtime') { renderRealtime(); startRealtimeUpdates(); }
+  else if (page === 'logs') renderLogs();
+}
+
+// 侧边栏切换（移动端）
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// 关闭侧边栏（点击内容区域时）
+document.querySelector('.main-content').addEventListener('click', function(e) {
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+});
+
+// ==================== 仪表盘 ====================
+function renderDashboard() {
+  const onlineDrivers = DATA.drivers.filter(d => d.status === 'online').length;
+  const todayOrders = DATA.orders.filter(o => o.date === new Date().toISOString().split('T')[0]);
+  const completedToday = todayOrders.filter(o => o.status === 'completed').length;
+  const totalRevenue = todayOrders.reduce((sum, o) => sum + (o.status === 'completed' ? parseFloat(o.amount) : 0), 0);
+
+  document.getElementById('statDrivers').textContent = DATA.drivers.length;
+  document.getElementById('statDriversChange').textContent = `↑ 在线: ${onlineDrivers}`;
+  document.getElementById('statPassengers').textContent = DATA.passengers.length;
+  document.getElementById('statPassengersChange').textContent = `↑ 活跃: ${DATA.passengers.filter(p => p.status === 'active').length}`;
+  document.getElementById('statOrders').textContent = DATA.orders.length;
+  document.getElementById('statOrdersChange').textContent = `↑ 今日完成: ${completedToday}`;
+  document.getElementById('statRevenue').textContent = `¥${totalRevenue.toFixed(2)}`;
+  document.getElementById('statRevenueChange').textContent = `↑ 较昨日: +${(Math.random() * 20 + 5).toFixed(0)}%`;
+
+  // 更新徽章
+  document.getElementById('driverCountBadge').textContent = DATA.drivers.length;
+  document.getElementById('passengerCountBadge').textContent = DATA.passengers.length;
+  document.getElementById('orderCountBadge').textContent = DATA.orders.length;
+
+  // 在线司机列表
+  const onlineDriversList = DATA.drivers.filter(d => d.status === 'online').slice(0, 5);
+  const onlineDriversHtml = onlineDriversList.length > 0 
+    ? onlineDriversList.map(d => `
+      <tr onclick="showDriverDetail(${d.id})">
+        <td>
+          <div class="user-cell">
+            <div class="avatar-sm" style="background:var(--primary);">${d.name[0]}</div>
+            <div>
+              <div class="user-name">${d.name}</div>
+              <div class="user-sub">${d.phone}</div>
+            </div>
+          </div>
+        </td>
+        <td>${d.plate}</td>
+        <td><span class="rating-stars">★</span> ${d.rating}</td>
+        <td>${d.orders}</td>
+      </tr>
+    `).join('')
+    : '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无在线司机</td></tr>';
+  document.getElementById('onlineDriversTable').innerHTML = onlineDriversHtml;
+
+  // 待处理订单
+  const pendingOrders = DATA.orders.filter(o => o.status === 'waiting' || o.status === 'matched').slice(0, 5);
+  const pendingHtml = pendingOrders.length > 0
+    ? pendingOrders.map(o => `
+      <tr onclick="showOrderDetail(${o.id})">
+        <td>${o.passenger}</td>
+        <td>${o.from} → ${o.to}</td>
+        <td><span class="status-badge ${o.status}">${o.status === 'waiting' ? '⏳ 匹配中' : '🤝 已配对'}</span></td>
+        <td><button class="action-btn primary btn-sm" onclick="event.stopPropagation();assignDriver(${o.id})">分配司机</button></td>
+      </tr>
+    `).join('')
+    : '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无待处理订单</td></tr>';
+  document.getElementById('pendingOrdersTable').innerHTML = pendingHtml;
+
+  // 实时日志
+  renderRealtimeLog();
+}
+
+// ==================== 实时日志 ====================
+function renderRealtimeLog() {
+  const logs = DATA.logs.slice(0, 8);
+  if (logs.length === 0) {
+    document.getElementById('realtimeLog').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">暂无实时动态</div>
+      </div>
+    `;
+    return;
+  }
+  
+  document.getElementById('realtimeLog').innerHTML = logs.map(log => `
+    <div class="log-item">
+      <span class="log-time">${log.time}</span>
+      <span class="log-icon">${log.type === 'success' ? '✅' : log.type === 'warning' ? '⚠️' : log.type === 'error' ? '❌' : 'ℹ️'}</span>
+      <span class="log-msg">
+        <span class="log-type ${log.type}">${log.type.toUpperCase()}</span>
+        ${log.msg}
+      </span>
+    </div>
+  `).join('');
+}
+
+// ==================== 司机管理 ====================
+function renderDrivers() {
+  const html = DATA.drivers.map(d => `
+    <tr onclick="showDriverDetail(${d.id})">
+      <td>
+        <div class="user-cell">
+          <div class="avatar-sm" style="background:${d.status === 'online' ? 'var(--green)' : 'var(--text-secondary)'};">${d.name[0]}</div>
+          <div>
+            <div class="user-name">${d.name}</div>
+            <div class="user-sub">${d.phone}</div>
+          </div>
+        </div>
+      </td>
+      <td>${d.plate}</td>
+      <td>${d.phone}</td>
+      <td><span class="status-badge ${d.status}">${d.status === 'online' ? '🟢 在线' : '🔴 离线'}</span></td>
+      <td><span class="rating-stars">★</span> ${d.rating}</td>
+      <td>${d.orders}</td>
+      <td>${d.joinDate}</td>
+      <td>
+        <button class="action-btn outline btn-sm" onclick="event.stopPropagation();editDriver(${d.id})">✏️</button>
+        <button class="action-btn danger btn-sm" onclick="event.stopPropagation();deleteDriver(${d.id})">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('driversTableBody').innerHTML = html;
+}
+
+// ==================== 乘客管理 ====================
+function renderPassengers() {
+  const html = DATA.passengers.map(p => `
+    <tr onclick="showPassengerDetail(${p.id})">
+      <td>
+        <div class="user-cell">
+          <div class="avatar-sm" style="background:#8b5cf6;">${p.name[0]}</div>
+          <div>
+            <div class="user-name">${p.name}</div>
+            <div class="user-sub">${p.phone}</div>
+          </div>
+        </div>
+      </td>
+      <td>${p.phone}</td>
+      <td>${p.school}</td>
+      <td>${p.orders}</td>
+      <td>${p.joinDate}</td>
+      <td><span class="status-badge ${p.status === 'active' ? 'online' : 'offline'}">${p.status === 'active' ? '🟢 活跃' : '⚪ 非活跃'}</span></td>
+      <td>
+        <button class="action-btn outline btn-sm" onclick="event.stopPropagation();editPassenger(${p.id})">✏️</button>
+        <button class="action-btn danger btn-sm" onclick="event.stopPropagation();deletePassenger(${p.id})">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('passengersTableBody').innerHTML = html;
+}
+
+// ==================== 订单管理 ====================
+function renderOrders(filter = 'all') {
+  let orders = DATA.orders;
+  if (filter !== 'all') orders = orders.filter(o => o.status === filter);
+  
+  const html = orders.map(o => `
+    <tr onclick="showOrderDetail(${o.id})">
+      <td><strong>#${o.id}</strong></td>
+      <td>${o.passenger}</td>
+      <td>${o.driver}</td>
+      <td>${o.from} → ${o.to}</td>
+      <td>¥${o.amount}</td>
+      <td>
+        <span class="status-badge ${o.status}">
+          ${o.status === 'waiting' ? '⏳ 匹配中' : o.status === 'matched' ? '🤝 已配对' : o.status === 'active' ? '🚗 行程中' : o.status === 'completed' ? '✅ 已完成' : '❌ 已取消'}
+        </span>
+      </td>
+      <td>${o.date} ${o.time}</td>
+      <td>
+        <button class="action-btn primary btn-sm" onclick="event.stopPropagation();showOrderDetail(${o.id})">查看</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('ordersTableBody').innerHTML = html;
+}
+
+function filterOrders() {
+  const filter = document.getElementById('orderFilter').value;
+  renderOrders(filter);
+}
+
+// ==================== 实时追踪 ====================
+let realtimeInterval = null;
+
+function renderRealtime() {
+  const activeOrders = DATA.orders.filter(o => o.status === 'active');
+  document.getElementById('activeTrips').textContent = activeOrders.length;
+  document.getElementById('todayCompleted').textContent = DATA.orders.filter(o => o.status === 'completed' && o.date === new Date().toISOString().split('T')[0]).length;
+  document.getElementById('avgRating').textContent = (DATA.drivers.reduce((sum, d) => sum + parseFloat(d.rating), 0) / DATA.drivers.length).toFixed(1);
+  document.getElementById('realtimeOnlineCount').textContent = DATA.drivers.filter(d => d.status === 'online').length;
+
+  // 模拟车辆位置
+  renderMapMarkers();
+  
+  // 活跃行程
+  const tripsHtml = activeOrders.length > 0
+    ? activeOrders.map(o => `
+      <tr>
+        <td>${o.driver}</td>
+        <td>${o.passenger}</td>
+        <td>${o.from} → ${o.to}</td>
+        <td>
+          <div style="width:100px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="width:${Math.floor(Math.random() * 60 + 20)}%;height:100%;background:var(--primary);border-radius:3px;"></div>
+          </div>
+        </td>
+        <td><span class="status-badge active">🚗 行程中</span></td>
+      </tr>
+    `).join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-secondary);">暂无进行中的行程</td></tr>';
+  document.getElementById('activeTripsTable').innerHTML = tripsHtml;
+}
+
+function renderMapMarkers() {
+  const onlineDrivers = DATA.drivers.filter(d => d.status === 'online');
+  const mapEl = document.getElementById('realtimeMap');
+  const markersContainer = document.getElementById('mapMarkersContainer');
+  
+  if (onlineDrivers.length === 0) {
+    markersContainer.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.9);padding:20px 30px;border-radius:12px;text-align:center;"><div style="font-size:40px;margin-bottom:8px;">🗺️</div><div style="font-weight:600;">暂无在线司机</div></div>';
+    return;
+  }
+  
+  const markers = onlineDrivers.map((d, i) => {
+    // 模拟位置：随机分布在800x400区域内
+    const left = 5 + Math.random() * 90;
+    const top = 5 + Math.random() * 90;
+    return `
+      <div class="map-marker" style="left:${left}%;top:${top}%;font-size:${20 + Math.random() * 10}px;animation:pulse${i} 2s infinite;">
+        <div class="marker-label">${d.name} · ${d.plate}</div>
+        🚗
+      </div>
+    `;
+  }).join('');
+  
+  markersContainer.innerHTML = markers;
+  
+  // 添加动画
+  const style = document.createElement('style');
+  style.textContent = onlineDrivers.map((d, i) => `
+    @keyframes pulse${i} {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+  `).join('');
+  markersContainer.appendChild(style);
+}
+
+function startRealtimeUpdates() {
+  if (realtimeInterval) clearInterval(realtimeInterval);
+  realtimeInterval = setInterval(() => {
+    renderRealtime();
+  }, 5000);
+  renderRealtime();
+}
+
+// ==================== 操作日志 ====================
+function renderLogs() {
+  const logs = DATA.logs;
+  if (logs.length === 0) {
+    document.getElementById('logsContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-title">暂无操作日志</div>
+        <div class="empty-desc">系统操作记录将在这里显示</div>
+      </div>
+    `;
+    return;
+  }
+  
+  document.getElementById('logsContainer').innerHTML = logs.map(log => `
+    <div class="log-item">
+      <span class="log-time">${log.time}</span>
+      <span class="log-icon">${log.type === 'success' ? '✅' : log.type === 'warning' ? '⚠️' : log.type === 'error' ? '❌' : 'ℹ️'}</span>
+      <span class="log-msg">
+        <span class="log-type ${log.type}">${log.type.toUpperCase()}</span>
+        ${log.msg}
+      </span>
+    </div>
+  `).join('');
+}
+
+function clearLogs() {
+  DATA.logs = [];
+  renderLogs();
+  showToast('success', '日志已清空');
+}
+
+// ==================== 模态框操作 ====================
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// 点击遮罩关闭
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('show');
+    }
+  });
+});
+
+// ==================== 司机CRUD ====================
+function openDriverModal(data = null) {
+  if (data) {
+    document.getElementById('driverModalTitle').textContent = '编辑司机';
+    document.getElementById('editDriverId').value = data.id;
+    document.getElementById('driverName').value = data.name;
+    document.getElementById('driverPhone').value = data.phone;
+    document.getElementById('driverPlate').value = data.plate;
+    document.getElementById('driverEmail').value = data.email || '';
+  } else {
+    document.getElementById('driverModalTitle').textContent = '添加司机';
+    document.getElementById('editDriverId').value = '';
+    document.getElementById('driverName').value = '';
+    document.getElementById('driverPhone').value = '';
+    document.getElementById('driverPlate').value = '';
+    document.getElementById('driverEmail').value = '';
+  }
+  openModal('driverModal');
+}
+
+function editDriver(id) {
+  const driver = DATA.drivers.find(d => d.id === id);
+  if (driver) openDriverModal(driver);
+}
+
+function saveDriver() {
+  const id = document.getElementById('editDriverId').value;
+  const name = document.getElementById('driverName').value.trim();
+  const phone = document.getElementById('driverPhone').value.trim();
+  const plate = document.getElementById('driverPlate').value.trim();
+  const email = document.getElementById('driverEmail').value.trim();
+
+  if (!name || name.length < 2) { showToast('error', '姓名至少2个字符'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('error', '手机号格式不正确'); return; }
+  if (!plate) { showToast('error', '请输入车牌号'); return; }
+
+  if (id) {
+    // 编辑
+    const index = DATA.drivers.findIndex(d => d.id == id);
+    if (index !== -1) {
+      DATA.drivers[index] = { ...DATA.drivers[index], name, phone, plate, email };
+      showToast('success', '司机信息已更新');
+    }
+  } else {
+    // 添加
+    const newDriver = {
+      id: DATA.drivers.length > 0 ? Math.max(...DATA.drivers.map(d => d.id)) + 1 : 1,
+      name,
+      phone,
+      plate,
+      email,
+      status: 'offline',
+      rating: '5.0',
+      orders: 0,
+      joinDate: new Date().toISOString().split('T')[0],
+      earnings: 0
+    };
+    DATA.drivers.push(newDriver);
+    showToast('success', '司机添加成功');
+  }
+  
+  closeModal('driverModal');
+  renderDrivers();
+  renderDashboard();
+}
+
+function deleteDriver(id) {
+  if (!confirm('确定要删除该司机吗？')) return;
+  DATA.drivers = DATA.drivers.filter(d => d.id !== id);
+  showToast('success', '司机已删除');
+  renderDrivers();
+  renderDashboard();
+}
+
+// ==================== 乘客CRUD ====================
+function openPassengerModal(data = null) {
+  if (data) {
+    document.getElementById('passengerModalTitle').textContent = '编辑乘客';
+    document.getElementById('editPassengerId').value = data.id;
+    document.getElementById('passengerName').value = data.name;
+    document.getElementById('passengerPhone').value = data.phone;
+    document.getElementById('passengerSchool').value = data.school;
+  } else {
+    document.getElementById('passengerModalTitle').textContent = '添加乘客';
+    document.getElementById('editPassengerId').value = '';
+    document.getElementById('passengerName').value = '';
+    document.getElementById('passengerPhone').value = '';
+    document.getElementById('passengerSchool').value = '';
+  }
+  openModal('passengerModal');
+}
+
+function editPassenger(id) {
+  const passenger = DATA.passengers.find(p => p.id === id);
+  if (passenger) openPassengerModal(passenger);
+}
+
+function savePassenger() {
+  const id = document.getElementById('editPassengerId').value;
+  const name = document.getElementById('passengerName').value.trim();
+  const phone = document.getElementById('passengerPhone').value.trim();
+  const school = document.getElementById('passengerSchool').value.trim();
+
+  if (!name || name.length < 2) { showToast('error', '姓名至少2个字符'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('error', '手机号格式不正确'); return; }
+  if (!school) { showToast('error', '请输入学校名称'); return; }
+
+  if (id) {
+    const index = DATA.passengers.findIndex(p => p.id == id);
+    if (index !== -1) {
+      DATA.passengers[index] = { ...DATA.passengers[index], name, phone, school };
+      showToast('success', '乘客信息已更新');
+    }
+  } else {
+    const newPassenger = {
+      id: DATA.passengers.length > 0 ? Math.max(...DATA.passengers.map(p => p.id)) + 1 : 1,
+      name,
+      phone,
+      school,
+      orders: 0,
+      joinDate: new Date().toISOString().split('T')[0],
+      status: 'active'
+    };
+    DATA.passengers.push(newPassenger);
+    showToast('success', '乘客添加成功');
+  }
+
+  closeModal('passengerModal');
+  renderPassengers();
+  renderDashboard();
+}
+
+function deletePassenger(id) {
+  if (!confirm('确定要删除该乘客吗？')) return;
+  DATA.passengers = DATA.passengers.filter(p => p.id !== id);
+  showToast('success', '乘客已删除');
+  renderPassengers();
+  renderDashboard();
+}
+
+// ==================== 详情查看 ====================
+function showDriverDetail(id) {
+  const driver = DATA.drivers.find(d => d.id === id);
+  if (!driver) return;
+  
+  document.getElementById('detailModalTitle').textContent = `司机详情 - ${driver.name}`;
+  document.getElementById('detailModalBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">姓名</span>
+        <span class="detail-value">${driver.name}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">车牌</span>
+        <span class="detail-value">${driver.plate}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">手机</span>
+        <span class="detail-value">${driver.phone}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">邮箱</span>
+        <span class="detail-value">${driver.email || '-'}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">状态</span>
+        <span class="detail-value"><span class="status-badge ${driver.status}">${driver.status === 'online' ? '🟢 在线' : '🔴 离线'}</span></span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">评分</span>
+        <span class="detail-value"><span class="rating-stars">★</span> ${driver.rating}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">总订单</span>
+        <span class="detail-value">${driver.orders} 单</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">总收入</span>
+        <span class="detail-value" style="color:var(--green);">¥${driver.earnings.toLocaleString()}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">加入时间</span>
+        <span class="detail-value">${driver.joinDate}</span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-sm" onclick="closeModal('detailModal');editDriver(${driver.id})">编辑信息</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">关闭</button>
+    </div>
+  `;
+  openModal('detailModal');
+}
+
+function showPassengerDetail(id) {
+  const passenger = DATA.passengers.find(p => p.id === id);
+  if (!passenger) return;
+  
+  document.getElementById('detailModalTitle').textContent = `乘客详情 - ${passenger.name}`;
+  document.getElementById('detailModalBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">姓名</span>
+        <span class="detail-value">${passenger.name}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">手机</span>
+        <span class="detail-value">${passenger.phone}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">学校</span>
+        <span class="detail-value">${passenger.school}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">订单数</span>
+        <span class="detail-value">${passenger.orders} 单</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">注册时间</span>
+        <span class="detail-value">${passenger.joinDate}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">状态</span>
+        <span class="detail-value"><span class="status-badge ${passenger.status === 'active' ? 'online' : 'offline'}">${passenger.status === 'active' ? '🟢 活跃' : '⚪ 非活跃'}</span></span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-sm" onclick="closeModal('detailModal');editPassenger(${passenger.id})">编辑信息</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">关闭</button>
+    </div>
+  `;
+  openModal('detailModal');
+}
+
+function showOrderDetail(id) {
+  const order = DATA.orders.find(o => o.id === id);
+  if (!order) return;
+  
+  document.getElementById('detailModalTitle').textContent = `订单详情 - #${order.id}`;
+  document.getElementById('detailModalBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">订单编号</span>
+        <span class="detail-value">#${order.id}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">乘客</span>
+        <span class="detail-value">${order.passenger}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">司机</span>
+        <span class="detail-value">${order.driver}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">出发地</span>
+        <span class="detail-value">${order.from}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">目的地</span>
+        <span class="detail-value">${order.to}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">金额</span>
+        <span class="detail-value" style="color:var(--green);">¥${order.amount}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">状态</span>
+        <span class="detail-value">
+          <span class="status-badge ${order.status}">
+            ${order.status === 'waiting' ? '⏳ 匹配中' : order.status === 'matched' ? '🤝 已配对' : order.status === 'active' ? '🚗 行程中' : order.status === 'completed' ? '✅ 已完成' : '❌ 已取消'}
+          </span>
+        </span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">时间</span>
+        <span class="detail-value">${order.date} ${order.time}</span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">关闭</button>
+    </div>
+  `;
+  openModal('detailModal');
+}
+
+// ==================== 订单操作 ====================
+function assignDriver(orderId) {
+  const order = DATA.orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const availableDrivers = DATA.drivers.filter(d => d.status === 'online');
+  if (availableDrivers.length === 0) {
+    showToast('warning', '没有可用的在线司机');
+    return;
+  }
+  
+  const driver = availableDrivers[Math.floor(Math.random() * availableDrivers.length)];
+  order.driver = driver.name;
+  order.status = 'matched';
+  showToast('success', `已将订单 #${orderId} 分配给 ${driver.name}`);
+  renderDashboard();
+  renderOrders();
+}
+
+// ==================== 全局搜索 ====================
+let searchTimeout = null;
+
+function debounceSearch(value) {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    if (value.trim()) {
+      console.log('搜索:', value);
+      showToast('info', `搜索 "${value}" 的结果`);
+    }
+  }, 500);
+}
+
+// ==================== 设置 ====================
+function saveSettings() {
+  showToast('success', '设置已保存');
+}
+
+// ==================== 数据刷新 ====================
+function refreshData() {
+  showToast('info', '正在刷新数据...');
+  setTimeout(() => {
+    renderDashboard();
+    const activePage = document.querySelector('.page-section.active');
+    if (activePage) {
+      const pageId = activePage.id.replace('page-', '');
+      switchPage(pageId);
+    }
+    showToast('success', '数据已刷新');
+  }, 500);
+}
+
+// ==================== Toast ====================
+function showToast(type, msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+    <span>${msg}</span>
+  `;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100px)';
+    toast.style.transition = 'all 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ==================== 初始化 ====================
+document.addEventListener('DOMContentLoaded', function() {
+  initMockData();
+  switchPage('dashboard');
+  
+  // 模拟实时日志更新
+  setInterval(() => {
+    if (document.querySelector('#page-dashboard.active')) {
+      const d = new Date();
+      const newLog = {
+        time: d.toLocaleTimeString('zh-CN', { hour12: false }),
+        type: ['info', 'success', 'warning'][Math.floor(Math.random() * 3)],
+        msg: ['新订单已创建', '司机状态更新', '系统自动匹配', '用户完成支付', '新用户注册'][Math.floor(Math.random() * 5)]
+      };
+      DATA.logs.unshift(newLog);
+      if (DATA.logs.length > 50) DATA.logs.pop();
+      renderRealtimeLog();
+    }
+  }, 8000);
+});
+</script>
+</body>
+</html>

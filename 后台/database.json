@@ -1,0 +1,260 @@
+{
+  "drivers": [
+    {
+      "id": 1,
+      "name": "王师傅",
+      "plate": "甘A·8K632",
+      "phone": "13800000001",
+      "status": "online",
+      "rating": 4.9,
+      "orders": 128,
+      "earnings": 5860,
+      "joinDate": "2024-01-15",
+      "auth": true,
+      "violations": 0,
+      "email": "wang@example.com"
+    },
+    {
+      "id": 2,
+      "name": "张师傅",
+      "plate": "甘A·5L891",
+      "phone": "13800000002",
+      "status": "online",
+      "rating": 4.8,
+      "orders": 96,
+      "earnings": 4230,
+      "joinDate": "2024-02-01",
+      "auth": true,
+      "violations": 1,
+      "email": "zhang@example.com"
+    },
+    {
+      "id": 3,
+      "name": "刘师傅",
+      "plate": "甘A·3M456",
+      "phone": "13800000003",
+      "status": "offline",
+      "rating": 4.7,
+      "orders": 72,
+      "earnings": 3120,
+      "joinDate": "2024-03-10",
+      "auth": true,
+      "violations": 0,
+      "email": "liu@example.com"
+    },
+    {
+      "id": 4,
+      "name": "赵师傅",
+      "plate": "甘A·9K123",
+      "phone": "13800000004",
+      "status": "online",
+      "rating": 4.6,
+      "orders": 54,
+      "earnings": 2450,
+      "joinDate": "2024-04-01",
+      "auth": false,
+      "violations": 2,
+      "email": "zhao@example.com"
+    },
+    {
+      "id": 5,
+      "name": "陈师傅",
+      "plate": "甘A·2M777",
+      "phone": "13800000005",
+      "status": "offline",
+      "rating": 4.5,
+      "orders": 31,
+      "earnings": 1580,
+      "joinDate": "2024-05-20",
+      "auth": true,
+      "violations": 0,
+      "email": "chen@example.com"
+    }
+  ],
+  "passengers": [
+    {
+      "id": 1,
+      "name": "杨同学",
+      "school": "西北民族大学",
+      "phone": "13800001111",
+      "trips": 28,
+      "rating": 4.9,
+      "joinDate": "2024-01-10",
+      "auth": true,
+      "status": "active",
+      "email": "yang@student.com"
+    },
+    {
+      "id": 2,
+      "name": "李同学",
+      "school": "兰州大学",
+      "phone": "13800002222",
+      "trips": 15,
+      "rating": 4.8,
+      "joinDate": "2024-02-15",
+      "auth": true,
+      "status": "active",
+      "email": "li@student.com"
+    },
+    {
+      "id": 3,
+      "name": "张同学",
+      "school": "西北民族大学",
+      "phone": "13800003333",
+      "trips": 8,
+      "rating": 4.5,
+      "joinDate": "2024-03-20",
+      "auth": false,
+      "status": "pending",
+      "email": "zhang@student.com"
+    },
+    {
+      "id": 4,
+      "name": "赵同学",
+      "school": "兰州理工大学",
+      "phone": "13800004444",
+      "trips": 22,
+      "rating": 4.7,
+      "joinDate": "2024-01-25",
+      "auth": true,
+      "status": "active",
+      "email": "zhao@student.com"
+    },
+    {
+      "id": 5,
+      "name": "王同学",
+      "school": "兰州大学",
+      "phone": "13800005555",
+      "trips": 5,
+      "rating": 4.2,
+      "joinDate": "2024-06-01",
+      "auth": false,
+      "status": "blocked",
+      "email": "wang@student.com"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ORD-2024001",
+      "passenger": "杨同学",
+      "route": "榆中校区 → 中川机场",
+      "driver": "王师傅",
+      "amount": 60,
+      "status": "active",
+      "time": "2024-06-27T14:30",
+      "type": "拼车",
+      "passengers": 3
+    },
+    {
+      "id": "ORD-2024002",
+      "passenger": "李同学",
+      "route": "榆中校区 → 兰州西站",
+      "driver": "张师傅",
+      "amount": 35,
+      "status": "pending",
+      "time": "2024-06-27T15:00",
+      "type": "拼车",
+      "passengers": 2
+    },
+    {
+      "id": "ORD-2024003",
+      "passenger": "张同学",
+      "route": "榆中校区 → 兰州火车站",
+      "driver": "刘师傅",
+      "amount": 28,
+      "status": "completed",
+      "time": "2024-06-27T13:00",
+      "type": "独立约车",
+      "passengers": 1
+    },
+    {
+      "id": "ORD-2024004",
+      "passenger": "赵同学",
+      "route": "榆中校区 → 中川机场",
+      "driver": "王师傅",
+      "amount": 55,
+      "status": "active",
+      "time": "2024-06-27T16:00",
+      "type": "拼车",
+      "passengers": 4
+    },
+    {
+      "id": "ORD-2024005",
+      "passenger": "王同学",
+      "route": "榆中校区 → 兰州西站",
+      "driver": null,
+      "amount": 30,
+      "status": "pending",
+      "time": "2024-06-27T17:00",
+      "type": "拼车",
+      "passengers": 2
+    }
+  ],
+  "securityLogs": [
+    {
+      "id": 1,
+      "type": "投诉",
+      "content": "司机态度不好",
+      "reporter": "杨同学",
+      "target": "王师傅",
+      "time": "2024-06-26T14:00",
+      "status": "resolved"
+    },
+    {
+      "id": 2,
+      "type": "警告",
+      "content": "超速行驶",
+      "reporter": "系统",
+      "target": "张师傅",
+      "time": "2024-06-25T09:30",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "type": "投诉",
+      "content": "未按路线行驶",
+      "reporter": "李同学",
+      "target": "赵师傅",
+      "time": "2024-06-24T11:00",
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "type": "警告",
+      "content": "未实名认证",
+      "reporter": "系统",
+      "target": "赵师傅",
+      "time": "2024-06-23T15:00",
+      "status": "resolved"
+    }
+  ],
+  "payments": [
+    {
+      "id": "PAY-001",
+      "orderId": "ORD-2024001",
+      "amount": 60,
+      "method": "微信支付",
+      "status": "completed",
+      "time": "2024-06-27T14:35"
+    },
+    {
+      "id": "PAY-002",
+      "orderId": "ORD-2024003",
+      "amount": 28,
+      "method": "支付宝",
+      "status": "completed",
+      "time": "2024-06-27T13:05"
+    }
+  ],
+  "system": {
+    "version": "1.0.0",
+    "apiCalls": 0,
+    "lastUpdate": "2026-06-27T09:00:56.545Z"
+  },
+  "nextId": {
+    "driver": 6,
+    "passenger": 6,
+    "order": 2024006,
+    "security": 5
+  }
+}
