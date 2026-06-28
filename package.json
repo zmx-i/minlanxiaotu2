@@ -12,6 +12,8 @@
     "cors": "^2.8.6",
     "express": "^4.22.2",
     "jsonwebtoken": "^9.0.3",
+    "leancloud-storage": "^4.15.2",
+    "leanengine": "^3.8.0",
     "sqlite3": "^6.0.1"
   }
 }

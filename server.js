@@ -9,7 +9,7 @@ const http = require('http');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = process.env.PORT || 3456;
+const PORT = process.env.LEANCLOUD_APP_PORT || 3456;
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'minlan.db');
 const JWT_SECRET = process.env.JWT_SECRET || 'minlan-xiaotu-secret-2024';
 
@@ -637,6 +637,7 @@ app.get('*', (req, res) => {
 });
 
 // ========== 启动 ==========
+const PORT = process.env.PORT || 3456;
 const server = app.listen(PORT, () => {
   console.log(`民兰校途服务器启动: http://localhost:${PORT}`);
   console.log(`SQLite数据库: ${DB_PATH}`);
